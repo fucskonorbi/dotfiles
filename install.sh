@@ -15,7 +15,7 @@ set -euo pipefail
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BIN_DIR="$HOME/.local/bin"
 OPT_DIR="$HOME/.local/opt"
-PACKAGES=(zsh starship tmux git bat eza lazygit ripgrep nvim)
+PACKAGES=(zsh starship tmux git bat eza lazygit ripgrep nvim opencode)
 
 mkdir -p "$BIN_DIR" "$OPT_DIR" "$HOME/.config"
 
