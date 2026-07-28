@@ -1,0 +1,5 @@
+# ~/.config/bat/config
+--theme="Catppuccin Mocha"
+--style="numbers,changes,header"
+--italic-text=always
+--pager="less -FR"

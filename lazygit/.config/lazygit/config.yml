@@ -1,0 +1,30 @@
+gui:
+  nerdFontsVersion: "3"
+  theme:
+    activeBorderColor:
+      - "#cba6f7"
+      - bold
+    inactiveBorderColor:
+      - "#6c7086"
+    selectedLineBgColor:
+      - "#313244"
+    optionsTextColor:
+      - "#89b4fa"
+    cherryPickedCommitBgColor:
+      - "#45475a"
+    cherryPickedCommitFgColor:
+      - "#f5e0dc"
+    unstagedChangesColor:
+      - "#f38ba8"
+    defaultFgColor:
+      - "#cdd6f4"
+  showFileTree: true
+  showRandomTip: false
+  showIcons: true
+  border: rounded
+git:
+  pagers:
+    - colorArg: always
+      pager: delta --dark --paging=never
+os:
+  editPreset: "vim"

@@ -1,0 +1,60 @@
+[user]
+	name = Norbert Fucsko
+
+[include]
+	path = ~/.gitconfig.local
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+
+[init]
+	defaultBranch = main
+
+[core]
+	editor = vim
+	pager = delta
+	excludesfile = ~/.gitignore_global
+
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	navigate = true
+	side-by-side = true
+	line-numbers = true
+	dark = true
+	syntax-theme = "Catppuccin Mocha"
+	minus-style = "syntax #451a25"
+	minus-emph-style = "syntax #782035"
+	plus-style = "syntax #1a4721"
+	plus-emph-style = "syntax #207838"
+	line-numbers-minus-style = "#f38ba8"
+	line-numbers-plus-style = "#a6e3a1"
+	line-numbers-zero-style = "#6c7086"
+	file-style = "#89b4fa bold"
+	file-decoration-style = "#89b4fa ul"
+	hunk-header-style = "syntax bold"
+	hunk-header-decoration-style = "#cba6f7 box"
+
+[merge]
+	conflictstyle = diff3
+
+[diff]
+	colorMoved = default
+
+[pull]
+	rebase = false
+
+[fetch]
+	prune = true
+
+[alias]
+	st = status -sb
+	co = checkout
+	br = branch
+	lg = log --graph --pretty=format:'%C(auto)%h %C(#cba6f7)%an %C(#6c7086)%ar%C(auto)%d %s' --abbrev-commit
+	last = log -1 HEAD
+	unstage = restore --staged

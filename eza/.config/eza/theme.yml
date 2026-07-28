@@ -1,0 +1,29 @@
+colours:
+  filekinds:
+    normal: {r: 205, g: 214, b: 244}
+    directory: {r: 137, g: 180, b: 250}
+    symlink: {r: 148, g: 226, b: 213}
+    executable: {r: 166, g: 227, b: 161}
+  perms:
+    read: {r: 249, g: 226, b: 175}
+    write: {r: 243, g: 139, b: 168}
+    exec: {r: 166, g: 227, b: 161}
+    exec_sticky: {r: 203, g: 166, b: 247}
+    no_access: {r: 108, g: 112, b: 134}
+  size:
+    number_byte: {r: 205, g: 214, b: 244}
+    number_kilo: {r: 249, g: 226, b: 175}
+    number_mega: {r: 250, g: 179, b: 135}
+    number_giga: {r: 243, g: 139, b: 168}
+    unit_byte: {r: 108, g: 112, b: 134}
+    unit_kilo: {r: 108, g: 112, b: 134}
+    unit_mega: {r: 108, g: 112, b: 134}
+    unit_giga: {r: 108, g: 112, b: 134}
+  users:
+    user_you: {r: 166, g: 227, b: 161}
+    user_root: {r: 243, g: 139, b: 168}
+  git:
+    new: {r: 166, g: 227, b: 161}
+    modified: {r: 249, g: 226, b: 175}
+    deleted: {r: 243, g: 139, b: 168}
+    renamed: {r: 148, g: 226, b: 213}
