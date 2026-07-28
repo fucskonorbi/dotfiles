@@ -96,11 +96,29 @@ install_from_tarball() {
     rm -rf "$tmp"
 }
 
+install_fzf_tmux_script() {
+    # fzf-tmux is a plain shell script (not a compiled binary), so it's never
+    # bundled in fzf's per-arch release tarballs — only in the fzf git repo
+    # itself (bin/fzf-tmux). tmux-sessionx requires it, so fetch it directly.
+    if command -v fzf-tmux >/dev/null 2>&1; then
+        log "fzf-tmux already installed, skipping"
+        return
+    fi
+    if ! command -v fzf >/dev/null 2>&1; then
+        return
+    fi
+    log "Installing fzf-tmux helper script..."
+    curl -fsSL "https://raw.githubusercontent.com/junegunn/fzf/master/bin/fzf-tmux" \
+        -o "$BIN_DIR/fzf-tmux"
+    chmod 755 "$BIN_DIR/fzf-tmux"
+}
+
 install_linux() {
     log "Installing CLI tools as static binaries into $BIN_DIR ..."
     if [ "$ARCH" = amd64 ]; then
         install_from_tarball starship/starship            'starship-x86_64-unknown-linux-musl.tar.gz'        starship
         install_from_tarball junegunn/fzf                  'fzf-TAG_NOV-linux_amd64.tar.gz'                   fzf
+        install_fzf_tmux_script
         install_from_tarball ajeetdsouza/zoxide            'zoxide-TAG_NOV-x86_64-unknown-linux-musl.tar.gz'  zoxide
         install_from_tarball BurntSushi/ripgrep            'ripgrep-TAG_NOV-x86_64-unknown-linux-musl.tar.gz' rg
         install_from_tarball sharkdp/bat                   'bat-TAG-x86_64-unknown-linux-musl.tar.gz'         bat
@@ -112,6 +130,7 @@ install_linux() {
     else
         install_from_tarball starship/starship            'starship-aarch64-unknown-linux-musl.tar.gz'       starship
         install_from_tarball junegunn/fzf                  'fzf-TAG_NOV-linux_arm64.tar.gz'                   fzf
+        install_fzf_tmux_script
         install_from_tarball ajeetdsouza/zoxide            'zoxide-TAG_NOV-aarch64-unknown-linux-musl.tar.gz' zoxide
         install_from_tarball BurntSushi/ripgrep            'ripgrep-TAG_NOV-aarch64-unknown-linux-musl.tar.gz' rg
         install_from_tarball sharkdp/bat                   'bat-TAG-aarch64-unknown-linux-gnu.tar.gz'         bat
