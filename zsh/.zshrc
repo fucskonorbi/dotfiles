@@ -14,6 +14,32 @@ setopt AUTO_CD
 setopt EXTENDED_GLOB
 setopt INTERACTIVE_COMMENTS
 
+# zsh silently turns on vi command-line editing whenever $EDITOR/$VISUAL
+# *contains* the string "vi" — which "nvim" does — so vi-mode ends up enabled
+# implicitly below without us ever asking for it via `bindkey -v`. Since it's
+# on either way, make it explicit and fix its rough edges instead of fighting
+# it:
+bindkey -v
+# Default vi-mode delay between pressing Esc and the mode switch registering
+# is 0.4s (40 * 10ms); 10ms feels instant without breaking Esc-as-a-sequence
+# detection.
+export KEYTIMEOUT=10
+# Vi-mode's default insert-mode backspace is `vi-backward-delete-char`, which
+# (like real vim without `backspace=start`) refuses to delete characters that
+# were already on the line before you entered insert/append mode. Rebind it
+# to the normal unconditional backward-delete so `i`/`a` behave like every
+# other shell.
+bindkey -M viins '^?' backward-delete-char
+bindkey -M viins '^H' backward-delete-char
+
+# --- Completion behavior ---
+# AUTO_MENU is on by default in zsh: after the *second* consecutive Tab press
+# it switches into menu-completion, cycling through matches in place (the
+# Windows-style behavior). Turning it off restores the classic
+# list-matches-then-complete-common-prefix behavior instead.
+unsetopt AUTO_MENU
+zstyle ':completion:*' menu no
+
 # --- Word boundaries (alt+backspace / alt+d / ctrl+w) ---
 # zsh's default WORDCHARS (*?_-.[]~=/&;!#$%^(){}<>) treats "/", "_", "-", "~"
 # as part of a "word", so alt+backspace deletes across whole path segments
@@ -113,6 +139,15 @@ _vibe_repo_name() {
     basename "$(dirname "$common_dir")"
 }
 
+# Branch names often contain "/" (e.g. sandbox/some-feature), which git is
+# happy to use as an actual branch name, but which would create nested
+# directories under git_worktrees if used verbatim as a dir name. Flatten it
+# to a single path segment for the worktree dir while keeping the real
+# branch name (with slashes) for git itself.
+_vibe_dir_name() {
+    echo "${1//\//-}"
+}
+
 vibeup() {
     local branch_name="$1"
     if [ -z "$branch_name" ]; then
@@ -126,7 +161,7 @@ vibeup() {
 
     local repo_name worktree_dir
     repo_name=$(_vibe_repo_name) || return 1
-    worktree_dir="$HOME/git_worktrees/$repo_name/$branch_name"
+    worktree_dir="$HOME/git_worktrees/$repo_name/$(_vibe_dir_name "$branch_name")"
 
     if [ -e "$worktree_dir" ]; then
         echo "vibeup: worktree dir already exists: $worktree_dir" >&2
@@ -138,19 +173,17 @@ vibeup() {
     echo "vibeup: creating worktree '$branch_name' off $(git branch --show-current) at $worktree_dir"
     git worktree add -b "$branch_name" "$worktree_dir" || return 1
 
-    (
-        cd "$worktree_dir" || exit 1
+    cd "$worktree_dir" || return 1
 
-        if [ -f .gitmodules ]; then
-            echo "vibeup: initializing submodules..."
-            git submodule update --init --recursive
-        fi
+    if [ -f .gitmodules ]; then
+        echo "vibeup: initializing submodules..."
+        git submodule update --init --recursive
+    fi
 
-        # TODO: placeholder for per-project setup (install deps, copy env
-        # files, run codegen, etc.) — edit me.
+    # TODO: placeholder for per-project setup (install deps, copy env
+    # files, run codegen, etc.) — edit me.
 
-        opencode
-    )
+    opencode
 }
 
 vibedown() {
@@ -166,12 +199,20 @@ vibedown() {
 
     local repo_name worktree_dir
     repo_name=$(_vibe_repo_name) || return 1
-    worktree_dir="$HOME/git_worktrees/$repo_name/$branch_name"
+    worktree_dir="$HOME/git_worktrees/$repo_name/$(_vibe_dir_name "$branch_name")"
 
     if [ ! -d "$worktree_dir" ]; then
         echo "vibedown: no worktree found at $worktree_dir" >&2
         return 1
     fi
+
+    # If we're currently inside the worktree being removed, hop out first
+    # (git worktree remove refuses to remove the cwd).
+    case "$PWD" in
+        "$worktree_dir"|"$worktree_dir"/*)
+            cd "$HOME"
+            ;;
+    esac
 
     git worktree remove "$worktree_dir" --force \
         && echo "vibedown: removed worktree $worktree_dir"
